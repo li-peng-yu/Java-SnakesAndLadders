@@ -39,4 +39,4 @@ Beware of **snakes** (which set you back) and **ladders** (which boost your prog
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/snakes-and-ladders-java.git
+   git clone https://github.com/your-username/Java-SnakesAndLadders .git
