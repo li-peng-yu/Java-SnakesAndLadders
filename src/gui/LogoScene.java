@@ -11,12 +11,12 @@ import javafx.util.Duration;
 public class LogoScene {
 
     public static Scene getLogoScene(Runnable onFinish) {
-        ImageView logo = new ImageView(new Image("file:assets/logo.png"));
+        ImageView logo = new ImageView(new Image(LogoScene.class.getResource("/assets/logo.png").toExternalForm()));
         logo.setFitWidth(300);
         logo.setPreserveRatio(true);
 
         StackPane root = new StackPane(logo);
-        root.setStyle("-fx-background-color: black;");
+        root.setStyle("-fx-background-color: white;");
 
         Scene scene = new Scene(root, 800, 600);
 
