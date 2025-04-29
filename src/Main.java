@@ -1,5 +1,5 @@
 import gui.LogoScene;
-import gui.GameBoardGUI;
+import gui.LoginScene;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -9,9 +9,9 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Snakes and Ladders");
 
-        // 显示Logo页，3秒后加载游戏主界面
+        // 显示Logo页，3秒后加载登录界面
         primaryStage.setScene(LogoScene.getLogoScene(() -> {
-            primaryStage.setScene(GameBoardGUI.getGameScene());
+            primaryStage.setScene(LoginScene.getLoginScene(primaryStage));
         }));
 
         primaryStage.show();
