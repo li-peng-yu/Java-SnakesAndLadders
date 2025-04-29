@@ -31,8 +31,7 @@ public class LoginScene {
         registerButton.setPrefWidth(300);
         registerButton.setPrefHeight(40);
         registerButton.setFont(Font.font(14));  // 加统一字体大小
-        registerButton.setOnAction(e -> primaryStage.setScene(RegisterScene.getRegisterScene(primaryStage)));
-
+        8registerButton.setOnAction(e -> primaryStage.setScene(RegisterScene.getRegisterScene(primaryStage)));
         // 游客模式按钮
         Button guestBtn = new Button("Guest Mode");
         guestBtn.setPrefWidth(300);
@@ -55,5 +54,3 @@ public class LoginScene {
 
         return new Scene(root, 800, 600);
     }
-
-}
