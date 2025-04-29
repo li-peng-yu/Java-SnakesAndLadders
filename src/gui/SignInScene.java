@@ -53,7 +53,7 @@ public class SignInScene {
             if (user.isEmpty() || pass.isEmpty()) {
                 showAlert(Alert.AlertType.WARNING, "Incomplete Data", "请输入用户名和密码");
             } else if (UserManager.login(user, pass)) {
-                primaryStage.setScene(GameBoardGUI.getGameScene());
+                primaryStage.setScene(ModeSelectScene.getModeSelectScene(primaryStage));
             } else {
                 showAlert(Alert.AlertType.ERROR, "Login Failed", "用户名或密码错误");
             }
@@ -67,7 +67,7 @@ public class SignInScene {
         backBtn.setOnAction(e -> primaryStage.setScene(LoginScene.getLoginScene(primaryStage)));
 
         // 表单容器
-        VBox formBox = new VBox(15, title, usernameField, passwordField, signInBtn, guestBtn, backBtn);
+        VBox formBox = new VBox(15, title, usernameField, passwordField, signInBtn,  backBtn);
         formBox.setAlignment(Pos.CENTER);
         formBox.setPadding(new Insets(20));
         formBox.setMaxWidth(360);
