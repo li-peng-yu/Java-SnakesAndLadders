@@ -62,7 +62,7 @@ public class RegisterScene {
             currentCode = String.format("%04d", new Random().nextInt(10000));
             // 这里模拟发送：实际应接入短信 API
             System.out.println("验证码已发送：" + currentCode);
-            showAlert(Alert.AlertType.INFORMATION, "验证码发送", "验证码为：" + currentCode);
+            showAlert(Alert.AlertType.INFORMATION, "验证码为：" + currentCode);
         });
 
         // 注册按钮
@@ -81,15 +81,18 @@ public class RegisterScene {
             String code = codeField.getText().trim();
 
             if (phone.isEmpty() || user.isEmpty() || pass.isEmpty() || code.isEmpty()) {
-                showAlert(Alert.AlertType.WARNING, "Incomplete Data", "请完整填写所有信息");
+                showAlert(Alert.AlertType.WARNING, "Incomplete Data");
             } else if (!code.equals(currentCode)) {
-                showAlert(Alert.AlertType.ERROR, "Invalid Code", "验证码错误");
+                showAlert(Alert.AlertType.ERROR, "Invalid Code");
             } else {
-                // 注册用户，保存手机号、用户名、密码
-                UserManager.register(phone, user, pass);
-                showAlert(Alert.AlertType.INFORMATION, "Registration Successful",
-                        "注册成功，请返回登录界面。");
-                primaryStage.setScene(LoginScene.getLoginScene(primaryStage));
+                if (UserManger.NewAccount(user)) {
+                    UserManager.register(phone, user, pass);
+                    showAlert(Alert.AlertType.INFORMATION, "Registration Successful");
+                    primaryStage.setScene(ModeSelectScene.getModeSelectScene(primaryStage));
+                }
+                else {
+                    showAlert(Alert.AlertType.INFORMATION, "Username occupation");
+                }
             }
         });
 
@@ -121,11 +124,10 @@ public class RegisterScene {
         return new Scene(root, 800, 600);
     }
 
-    private static void showAlert(Alert.AlertType type, String header, String content) {
+    private static void showAlert(Alert.AlertType type, String header) {
         Alert alert = new Alert(type);
         alert.setTitle("");
         alert.setHeaderText(header);
-        alert.setContentText(content);
         alert.showAndWait();
     }
 }
