@@ -1,0 +1,166 @@
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * 用户类，表示系统中的一个用户
+ */
+class User implements Serializable {
+    private static final long serialVersionUID = 1L;//实现序列化的标记接口
+    private String username;        // 用户名
+    private String password;        // 密码
+    private boolean isGuest;        // 是否为游客标识
+
+    /**
+     * 注册用户构造函数
+     * @param username 用户名
+     * @param password 密码
+     */
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+        this.isGuest = false;
+    }
+
+    /**
+     * 游客用户构造函数
+     */
+    public User() {
+        this.username = "Guest_" + System.currentTimeMillis();
+        this.password = null;
+        this.isGuest = true;
+    }
+
+    /**
+     * 验证输入的密码是否正确
+     * @param inputPassword 输入的密码
+     * @return 验证结果
+     */
+    public boolean verifyPassword(String inputPassword) {
+        if (isGuest) return false;
+        return password.equals(inputPassword);
+    }
+
+    // Getter方法
+    public String getUsername() { return username; }
+    public boolean isGuest() { return isGuest; }
+}
+
+/**
+ * 用户管理类，负责用户注册、登录和持久化
+ */
+class UserManager {
+    private static final String SAVE_DIR = "users/";  // 用户数据保存目录
+    private Map<String, User> users = new HashMap<>(); // 内存中的用户数据
+
+    public UserManager() {
+        // 确保用户目录存在
+        new File(SAVE_DIR).mkdirs();//file类方法，创建指定路径的目录
+        loadUsersFromFiles();
+    }
+
+    /**
+     * 注册新用户
+     * @param username 用户名
+     * @param password 密码
+     */
+    public int register(String username, String password) {
+        // 检查用户名是否已存在
+        if (users.containsKey(username)) {
+            System.out.println("用户名已存在！");
+            return 0;  // 用户名已存在，返回0
+        }
+
+        // 创建新用户并保存
+        User newUser = new User(username, password);
+        users.put(username, newUser);
+        saveUserToFile(newUser);
+        return 1;  // 注册成功，返回1
+    }
+
+    public boolean login(String username, String password) {
+        User user = users.get(username);
+        // 用户不存在或密码错误
+        if (user == null || !user.verifyPassword(password)) {
+            System.out.println("用户名或密码错误！");
+            return false;
+        }
+        return true;
+    }
+
+    public User getUser(String username) {
+        return users.get(username);
+    }
+
+    private void loadUsersFromFiles() {
+        File dir = new File(SAVE_DIR);//定义好一个目录路径
+        if (!dir.exists()) return;
+
+        File[] files = dir.listFiles();
+        if (files == null) return;
+    }
+
+    /**
+     * 将用户数据保存到文件
+     * @param user 要保存的用户对象
+     */
+    private void saveUserToFile(User user) {
+        if (user.isGuest()) return;
+    }
+}
+
+/**
+ * 游戏会话类，管理当前用户的游戏会话
+ */
+class GameSession {
+    private User currentUser;      // 当前用户
+    private UserManager userManager; // 用户管理器
+
+    public GameSession(UserManager userManager) {
+        this.userManager = userManager;
+    }
+
+    /**
+     * 以游客身份启动游戏
+     */
+    public void startAsGuest() {
+        currentUser = new User();
+        System.out.println("游客模式启动，ID: " + currentUser.getUsername());
+        startGame();
+    }
+
+    /**
+     * 以注册/登录用户身份启动游戏
+     * @param username 用户名
+     * @param password 密码
+     * @param isNewUser 是否是新用户（注册）
+     */
+    public void startWithLogin(String username, String password, boolean isNewUser) {
+        if (isNewUser) {
+            // 新用户注册
+            if (userManager.register(username, password) == 0) {
+                return; // 注册失败
+            }
+        }
+
+        // 用户登录验证
+        if (userManager.login(username, password)) {
+            currentUser = userManager.getUser(username);
+            startGame();
+        }
+    }
+
+    /**
+     * 开始游戏主逻辑
+     */
+    private void startGame() {
+        System.out.println("\n=== 游戏开始 ===");
+        System.out.println("当前用户: " + currentUser.getUsername());
+        System.out.println("模式: " + (currentUser.isGuest() ? "游客" : "注册用户"));
+        // 这里可以添加游戏主逻辑
+    }
+
+    public User getCurrentUser() {
+        return currentUser;
+    }
+}
