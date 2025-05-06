@@ -19,7 +19,7 @@ public class SignInScene {
     public static Scene getSignInScene(Stage primaryStage) {
         // 背景
         ImageView background = new ImageView(
-                new Image(SignInScene.class.getResource("/assets/login_bg.jpg").toExternalForm())
+                new Image(SignInScene.class.getResource("/assets/login_bg.png").toExternalForm())
         );
         background.setFitWidth(800);
         background.setFitHeight(600);

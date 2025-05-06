@@ -1,17 +1,18 @@
 package gui;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.scene.paint.Color;
-import javafx.scene.control.Label;
+import javafx.stage.Stage;
 
 public class ModeSelectScene {
 
@@ -24,48 +25,50 @@ public class ModeSelectScene {
         background.setFitHeight(600);
         background.setPreserveRatio(false);
 
-        // 标题文字
+        // 标题文字（稍微上移）
         Label title = new Label("CHOOSE YOUR MODE");
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 28));
-        title.setTextFill(Color.web("#33475b"));
+        title.setFont(Font.font("Arial", FontWeight.BOLD, 26));
+        title.setTextFill(Color.web("#2f3e46")); // 深灰蓝，更和背景协调
+        title.setTranslateY(-140); // 上移
 
-        // 单人模式按钮
-        Button singlePlayerBtn = new Button("Single Player");
-        singlePlayerBtn.setPrefSize(300, 50);
-        singlePlayerBtn.setFont(Font.font(16));
-        singlePlayerBtn.setStyle(
-                "-fx-background-color: white; " +
-                        "-fx-text-fill: #2e7d32; " +
-                        "-fx-background-radius: 15; " +
-                        "-fx-border-color: #a5d6a7; " +
-                        "-fx-border-radius: 15;"
-        );
-        singlePlayerBtn.setOnAction(e -> primaryStage.setScene(GameBoardGUI.getGameScene(false)));
+        // 按钮统一尺寸与圆角美化
+        Button singleBtn = createModeButton("Single Player", "#2e7d32", () ->
+                primaryStage.setScene(GameBoardGUI.getGameScene(false)));
 
-        // 双人模式按钮
-        Button twoPlayerBtn = new Button("Two Players");
-        twoPlayerBtn.setPrefSize(300, 50);
-        twoPlayerBtn.setFont(Font.font(16));
-        twoPlayerBtn.setStyle(
-                "-fx-background-color: white; " +
-                        "-fx-text-fill: #1565c0; " +
-                        "-fx-background-radius: 15; " +
-                        "-fx-border-color: #90caf9; " +
-                        "-fx-border-radius: 15;"
-        );
-        twoPlayerBtn.setOnAction(e -> primaryStage.setScene(GameBoardGUI.getGameScene(true)));
+        Button twoBtn = createModeButton("Two Players", "#1565c0", () ->
+                primaryStage.setScene(GameBoardGUI.getGameScene(true)));
 
-        // 返回按钮
         Button backBtn = new Button("← Back");
-        backBtn.setFont(Font.font(12));
-        backBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: #33475b;");
+        backBtn.setFont(Font.font("Arial", 12));
+        backBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: #000;");
         backBtn.setOnAction(e -> primaryStage.setScene(LoginScene.getLoginScene(primaryStage)));
 
-        // 按钮容器
-        VBox vbox = new VBox(20, title, singlePlayerBtn, twoPlayerBtn, backBtn);
-        vbox.setAlignment(Pos.CENTER);
+        // 按钮容器（上下间距小一点，避免覆盖卡片）
+        VBox buttonBox = new VBox(15, singleBtn, twoBtn);
+        buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.setTranslateY(-10); // 稍微抬起居中
 
-        StackPane root = new StackPane(background, vbox);
+        VBox rootVBox = new VBox(10, title, buttonBox, backBtn);
+        rootVBox.setAlignment(Pos.CENTER);
+        rootVBox.setPadding(new Insets(20));
+
+        StackPane root = new StackPane(background, rootVBox);
         return new Scene(root, 800, 600);
+    }
+
+    private static Button createModeButton(String text, String color, Runnable action) {
+        Button button = new Button(text);
+        button.setPrefSize(240, 44);
+        button.setFont(Font.font("Verdana", 15));
+        button.setFont(Font.loadFont(
+                LoginScene.class.getResource("/assets/pixel_font.ttf").toExternalForm(), 24));
+        button.setStyle("-fx-background-color: transparent; " +
+                "-fx-text-fill: #fff; " +
+                "-fx-background-radius: 0; " +
+                "-fx-border-color: #000; " +
+                "-fx-border-width: 2; " +
+                "-fx-padding: 10 20; ");
+        button.setOnAction(e -> action.run());
+        return button;
     }
 }

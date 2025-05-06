@@ -14,7 +14,7 @@ public class PlayerToken {
     private static final int SIZE = 10;
 
     public PlayerToken(String avatarPath) {
-        avatar = new ImageView(new Image(PlayerToken.class.getResource(avatarPath).toExternalForm()));
+        avatar = new ImageView(new Image(PlayerToken.class.getResource("/assets/player1_avatar.png").toExternalForm()));
         avatar.setFitWidth(40);
         avatar.setFitHeight(40);
     }

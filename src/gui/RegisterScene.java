@@ -24,7 +24,7 @@ public class RegisterScene {
     public static Scene getRegisterScene(Stage primaryStage) {
         // 背景
         ImageView background = new ImageView(
-                new Image(RegisterScene.class.getResource("/assets/login_bg.jpg").toExternalForm())
+                new Image(RegisterScene.class.getResource("/assets/login_bg.png").toExternalForm())
         );
         background.setFitWidth(800);
         background.setFitHeight(600);
@@ -85,7 +85,7 @@ public class RegisterScene {
             } else if (!code.equals(currentCode)) {
                 showAlert(Alert.AlertType.ERROR, "Invalid Code");
             } else {
-                if (UserManger.NewAccount(user)) {
+                if (UserManager.NewAccount(user)) {
                     UserManager.register(phone, user, pass);
                     showAlert(Alert.AlertType.INFORMATION, "Registration Successful");
                     primaryStage.setScene(ModeSelectScene.getModeSelectScene(primaryStage));

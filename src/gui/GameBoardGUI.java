@@ -1,10 +1,14 @@
 package gui;
-
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-
+import javafx.scene.control.Label;
+import javafx.scene.control.Button;
+import javafx.stage.Stage;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.paint.Color;
 public class GameBoardGUI {
 
     private static PlayerToken player1;
