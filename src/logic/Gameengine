@@ -1,8 +1,9 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
 /**
- * 游戏引擎核心类，整合玩家管理、骰子、游戏逻辑
+ * 游戏引擎核心类，整合玩家管理、骰子、游戏逻辑和道具系统
  */
 public class Gameengine {
     // 玩家列表
@@ -17,50 +18,140 @@ public class Gameengine {
     private Random random = new Random();
     // 游戏模式标志 (true为单人模式，false为双人模式)
     private boolean singlePlayerMode;
-    /**特殊格子定义 [位置, 目标位置]，私有静态不可变二维数组常量
-     * 使用SPECIAL-CELLS可以访问数组中的元素*/
-
     
-    //玩家内部类
-    class Player {
-        String name;    // 玩家名称
-        int position;   // 当前位置
-        boolean isGuest;// 是否为游客
+    // 道具枚举
+    public enum Item {
+        FROZEN_TRAP("冰冻陷阱", "冻结对手一回合") {
+            @Override
+            public boolean use(Gameengine engine, Player user, Player target) {
+                if (target.isFrozen) {
+                    engine.addGameMessage(target.name + "已经被冻结了！");
+                    return false;
+                }
+                target.isFrozen = true;
+                engine.addGameMessage(user.name + "对" + target.name + "使用了冰冻陷阱！");
+                return true;
+            }
+        },
+        POSITION_SWAP("位置交换器", "立即与对手交换位置") {
+            @Override
+            public boolean use(Gameengine engine, Player user, Player target) {
+                int temp = user.position;
+                user.position = target.position;
+                target.position = temp;
+                engine.addGameMessage(user.name + "和" + target.name + "交换了位置！");
+                return true;
+            }
+        };
+        
+        private final String name;
+        private final String description;
+        
+        Item(String name, String description) {
+            this.name = name;
+            this.description = description;
+        }
+        
+        public String getName() {
+            return name;
+        }
+        
+        public String getDescription() {
+            return description;
+        }
+        
+        // 抽象方法，每个道具需要实现自己的使用逻辑
+        public abstract boolean use(Gameengine engine, Player user, Player target);
+    }
 
+    // 玩家内部类
+    class Player {
+        String name;       // 玩家名称
+        int position;      // 当前位置
+        boolean isGuest;   // 是否为游客
+        boolean isFrozen; // 是否被冻结
+        List<Item> items = new ArrayList<>(); // 玩家拥有的道具
+        
         Player(String name, boolean isGuest) {
             this.name = name;
             this.position = 0;  // 初始位置0表示未开始
             this.isGuest = isGuest;
+            this.isFrozen = false;
+            
+            // 初始给每个玩家随机分配1-2个道具
+            int itemCount = random.nextInt(2) + 1;
+            for (int i = 0; i < itemCount; i++) {
+                items.add(random.nextBoolean() ? Item.FROZEN_TRAP : Item.POSITION_SWAP);
+            }
+        }
+        
+        // 检查是否拥有特定道具
+        boolean hasItem(Item item) {
+            return items.contains(item);
+        }
+        
+        // 使用道具
+        boolean useItem(Item item, Gameengine engine, Player target) {
+            if (!hasItem(item)) {
+                engine.addGameMessage(name + "没有" + item.getName() + "道具！");
+                return false;
+            }
+            
+            if (item.use(engine, this, target)) {
+                items.remove(item);
+                return true;
+            }
+            return false;
         }
     }
+
+    // 特殊格子定义
+    private static final int[][] SPECIAL_CELLS = {
+        {4,14}, {9,31}, {17,7}, {21,42}, {28,84},
+        {51,67}, {54,34}, {62,19}, {64,60}, {71,91},
+        {80,100}, {87,24}, {93,73}, {95,75}, {98,79}
+    };
 
     /**
      * 构造函数初始化游戏
      * @param playerNames 玩家名称列表
      */
     public Gameengine(List<String> playerNames) {
-        // 根据名称创建玩家对象
         for (String name : playerNames) {
             players.add(new Player(name, name.equals("Guest")));
         }
-        currentPlayerIndex = 0;  // 从第一个玩家开始
-        singlePlayerMode = (playerNames.size() == 1); // 单人模式判断
+        currentPlayerIndex = 0;
+        singlePlayerMode = (playerNames.size() == 1);
     }
 
     /**
-     * 判断是否为单人模式
-     * @return true如果是单人模式，false如果是双人模式
+     * 使用道具方法
+     * @param item 要使用的道具
+     * @param targetPlayerIndex 目标玩家索引
+     * @return 是否使用成功
      */
-    public boolean isSinglePlayerMode() {
-        return singlePlayerMode;
+    public boolean useItem(Item item, int targetPlayerIndex) {
+        if (gameOver || targetPlayerIndex < 0 || targetPlayerIndex >= players.size()) {
+            return false;
+        }
+        
+        Player current = getCurrentPlayer();
+        Player target = players.get(targetPlayerIndex);
+        
+        if (current == target) {
+            addGameMessage("不能对自己使用道具！");
+            return false;
+        }
+        
+        return current.useItem(item, this, target);
     }
 
     /**
-     * 获取当前游戏玩家数量
-     * @return 玩家数量
+     * 获取当前玩家可用的道具列表
+     * @return 道具列表
      */
-    public int getPlayerCount() {
-        return players.size();
+    public List<Item> getCurrentPlayerItems() {
+        return new ArrayList<>(getCurrentPlayer().items);
     }
 
     /**
@@ -74,7 +165,12 @@ public class Gameengine {
         int steps = random.nextInt(6) + 1;
         movePlayer(steps);
         
-        // 检查游戏是否因AI移动而结束
+        // AI有30%概率使用道具
+        if (random.nextDouble() < 0.3 && !players.get(1).items.isEmpty()) {
+            Item item = players.get(1).items.get(0); // 使用第一个道具
+            useItem(item, 0); // 对人类玩家使用
+        }
+        
         if (!gameOver) {
             currentPlayerIndex = 0; // 切换回人类玩家
         }
@@ -88,57 +184,51 @@ public class Gameengine {
     public int rollDice() {
         if (gameOver) return -1;
 
-        // 生成1-6随机数
+        Player current = getCurrentPlayer();
+        // 检查是否被冻结
+        if (current.isFrozen) {
+            current.isFrozen = false;
+            addGameMessage(current.name + "被冻结，跳过一回合！");
+            currentPlayerIndex = singlePlayerMode ? 0 : (currentPlayerIndex + 1) % players.size();
+            return -2; // 特殊返回值表示被冻结
+        }
+
         int steps = random.nextInt(6) + 1;
-        // 移动当前玩家
         movePlayer(steps);
 
-        // 如果游戏未结束，切换到下一个玩家
         if (!gameOver) {
-            // 单人模式下只在人类和AI之间切换
             currentPlayerIndex = singlePlayerMode ? 0 : (currentPlayerIndex + 1) % players.size();
         }
         return steps;
     }
 
-    /**
-     * 移动玩家逻辑
-     * @param steps 移动步数
-     */
-    private static final int[][] SPECIAL_CELLS = {
-            {4,14}, {9,31}, {17,7}, {21,42}, {28,84},
-            {51,67}, {54,34}, {62,19}, {64,60}, {71,91},
-            {80,100}, {87,24}, {93,73}, {95,75}, {98,79}
-    };//
     private void movePlayer(int steps) {
         Player p = players.get(currentPlayerIndex);
-        // 计算新位置
         int newPos = p.position + steps;
 
-        // 弹回逻辑：超过100时反弹
         if (newPos > 100) {
             newPos = 100 - (newPos - 100);
         }
 
-        // 检查特殊格子
-        for (int[] cell : SPECIAL_CELLS) {//在数组special cells中遍历一维数组cell
-            if (cell[0] == newPos) {//如果第一个元素一样那么就给第二个索引为1的元素赋值给newposition
-                newPos = cell[1];  // 应用特殊格子效果
+        for (int[] cell : SPECIAL_CELLS) {
+            if (cell[0] == newPos) {
+                newPos = cell[1];
                 break;
             }
         }
 
-        // 更新玩家位置
         p.position = newPos;
 
-        // 检查是否获胜
         if (newPos == 100) {
             gameOver = true;
             winner = p;
         }
     }
 
-    //  获取游戏状态的方法 get方法
+    // 游戏消息处理
+    private void addGameMessage(String message) {
+        System.out.println("[游戏消息] " + message);
+    }
 
     /** 获取当前玩家 */
     public Player getCurrentPlayer() {
@@ -157,10 +247,18 @@ public class Gameengine {
 
     /** 重新开始游戏 */
     public void restart() {
-        // 重置所有玩家位置
-        players.forEach(p -> p.position = 0);
-        currentPlayerIndex = 0;  // 重置到第一个玩家
-        gameOver = false;       // 重置游戏状态
-        winner = null;          // 清除胜利者
+        players.forEach(p -> {
+            p.position = 0;
+            p.isFrozen = false;
+            p.items.clear();
+            // 重新分配道具
+            int itemCount = random.nextInt(2) + 1;
+            for (int i = 0; i < itemCount; i++) {
+                p.items.add(random.nextBoolean() ? Item.FROZEN_TRAP : Item.POSITION_SWAP);
+            }
+        });
+        currentPlayerIndex = 0;
+        gameOver = false;
+        winner = null;
     }
 }
