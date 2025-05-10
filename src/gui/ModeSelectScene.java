@@ -33,10 +33,10 @@ public class ModeSelectScene {
 
         // 按钮统一尺寸与圆角美化
         Button singleBtn = createModeButton("Single Player", "#2e7d32", () ->
-                primaryStage.setScene(GameBoardGUI.getGameScene(false)));
+                primaryStage.setScene(GameBoardGUI.getGameScene(primaryStage,false)));
 
         Button twoBtn = createModeButton("Two Players", "#1565c0", () ->
-                primaryStage.setScene(GameBoardGUI.getGameScene(true)));
+                primaryStage.setScene(GameBoardGUI.getGameScene(primaryStage,true)));
 
         Button backBtn = new Button("← Back");
         backBtn.setFont(Font.font("Arial", 12));
