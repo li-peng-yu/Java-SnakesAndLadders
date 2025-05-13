@@ -46,6 +46,8 @@ class User implements Serializable {
     // Getter方法
     public String getUsername() { return username; }
     public boolean isGuest() { return isGuest; }
+    // 新增方法 - 获取密码(用于序列化)
+    public String getPassword() { return password; }
 }
 
 /**
@@ -53,12 +55,14 @@ class User implements Serializable {
  */
 class UserManager {
     private static final String SAVE_DIR = "users/";  // 用户数据保存目录
+    private static final String ALL_USERS_FILE = "all_users.dat"; // 新增：所有用户数据文件
     private Map<String, User> users = new HashMap<>(); // 内存中的用户数据
 
     public UserManager() {
         // 确保用户目录存在
         new File(SAVE_DIR).mkdirs();//file类方法，创建指定路径的目录
         loadUsersFromFiles();
+        loadAllUsersFromFile(); // 新增：加载所有用户数据
     }
 
     /**
@@ -77,6 +81,7 @@ class UserManager {
         User newUser = new User(username, password);
         users.put(username, newUser);
         saveUserToFile(newUser);
+        saveAllUsersToFile(); // 新增：保存到所有用户文件
         return 1;  // 注册成功，返回1
     }
 
@@ -109,6 +114,46 @@ class UserManager {
     private void saveUserToFile(User user) {
         if (user.isGuest()) return;
     }
+
+    // 新增方法：保存游客信息
+    public void saveGuestUser(User guest) {
+        if (!guest.isGuest()) return;
+        
+        users.put(guest.getUsername(), guest);
+        saveAllUsersToFile();
+        System.out.println("游客信息已保存: " + guest.getUsername());
+    }
+
+    // 新增方法：从文件加载所有用户数据
+    @SuppressWarnings("unchecked")
+    private void loadAllUsersFromFile() {
+        File file = new File(SAVE_DIR + ALL_USERS_FILE);
+        if (!file.exists()) return;
+
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+            Map<String, User> loadedUsers = (Map<String, User>) ois.readObject();
+            // 合并加载的用户数据，不覆盖现有数据
+            for (Map.Entry<String, User> entry : loadedUsers.entrySet()) {
+                if (!users.containsKey(entry.getKey())) {
+                    users.put(entry.getKey(), entry.getValue());
+                }
+            }
+            System.out.println("从文件加载用户数据成功，共加载 " + loadedUsers.size() + " 个用户");
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("加载用户数据失败: " + e.getMessage());
+        }
+    }
+
+    // 新增方法：保存所有用户数据到文件
+    private void saveAllUsersToFile() {
+        try (ObjectOutputStream oos = new ObjectOutputStream(
+                new FileOutputStream(SAVE_DIR + ALL_USERS_FILE))) {
+            oos.writeObject(users);
+            System.out.println("用户数据保存成功，共保存 " + users.size() + " 个用户");
+        } catch (IOException e) {
+            System.err.println("保存用户数据失败: " + e.getMessage());
+        }
+    }
 }
 
 /**
@@ -127,6 +172,7 @@ class GameSession {
      */
     public void startAsGuest() {
         currentUser = new User();
+        userManager.saveGuestUser(currentUser); // 新增：保存游客信息
         System.out.println("游客模式启动，ID: " + currentUser.getUsername());
         startGame();
     }
