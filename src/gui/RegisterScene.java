@@ -19,6 +19,11 @@ import java.util.Random;
 
 public class RegisterScene {
 
+    private static Font baseFont = Font.loadFont(
+            GameBoardGUI.class.getResourceAsStream("/assets/pixel_font.ttf"),
+            28
+    );
+
     private static String currentCode;  // 保存当前验证码
 
     public static Scene getRegisterScene(Stage primaryStage) {
@@ -32,7 +37,12 @@ public class RegisterScene {
 
         // 标题
         Label title = new Label("Create Account");
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 28));
+        title.setFont(Font.font(
+                baseFont.getFamily(),      // 字体族名
+                FontWeight.BOLD,           // 加粗
+                28                         // 字号
+        ));
+
         title.setTextFill(Color.web("#33475b"));
 
         // 手机号 & 用户名
@@ -69,11 +79,14 @@ public class RegisterScene {
         Button registerBtn = new Button("Register");
         registerBtn.setPrefWidth(300);
         registerBtn.setFont(Font.font(14));
-        registerBtn.setStyle(
+        registerBtn.setFont(Font.loadFont(
+                LoginScene.class.getResource("/assets/pixel_font.ttf").toExternalForm(), 24));
+        registerBtn.setStyle("-fx-background-color: transparent; " +
+                "-fx-text-fill: #fff; " +
+                "-fx-background-radius: 0; " +
                 "-fx-background-color: #4a90e2; " +
-                        "-fx-text-fill: white; " +
-                        "-fx-background-radius: 20;"
-        );
+                "-fx-text-fill: white; " +
+                "-fx-background-radius: 20;");
         registerBtn.setOnAction(e -> {
             String phone = phoneField.getText().trim();
             String user = usernameField.getText().trim();

@@ -15,33 +15,45 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 public class ModeSelectScene {
-
+    private static Font baseFont = Font.loadFont(
+            GameBoardGUI.class.getResourceAsStream("/assets/pixel_font.ttf"),
+            28
+    );
     public static Scene getModeSelectScene(Stage primaryStage) {
         // 背景图
+        // >>> 根据彩蛋标记选择背景
+        String bgPath = useEasterBackground
+                ? "/assets/mode_select_easter.png"
+                : "/assets/mode_bg.png";
         ImageView background = new ImageView(new Image(
-                ModeSelectScene.class.getResource("/assets/mode_bg.png").toExternalForm()
-        ));
+                ModeSelectScene.class.getResource(bgPath).toExternalForm()));
         background.setFitWidth(800);
         background.setFitHeight(600);
         background.setPreserveRatio(false);
 
         // 标题文字（稍微上移）
         Label title = new Label("CHOOSE YOUR MODE");
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 26));
-        title.setTextFill(Color.web("#2f3e46")); // 深灰蓝，更和背景协调
-        title.setTranslateY(-140); // 上移
-
+        title.setFont(Font.font(
+                baseFont.getFamily(),      // 字体族名
+                FontWeight.BOLD,           // 加粗
+                28                         // 字号
+        ));
+        title.setTextFill(Color.web("#2f3e46"));
+        title.setTranslateY(-140);
         // 按钮统一尺寸与圆角美化
-        Button singleBtn = createModeButton("Single Player", "#2e7d32", () ->
-                primaryStage.setScene(GameBoardGUI.getGameScene(primaryStage,false)));
+        Button singleBtn = createModeButton("Single Player", "#2e7d32", () ->{
+            primaryStage.setScene(GameBoardGUI.getGameScene(primaryStage,false));}
+        );
 
-        Button twoBtn = createModeButton("Two Players", "#1565c0", () ->
-                primaryStage.setScene(GameBoardGUI.getGameScene(primaryStage,true)));
+        Button twoBtn = createModeButton("Two Players", "#1565c0", () ->{
+            primaryStage.setScene(GameBoardGUI.getGameScene(primaryStage,true));});
 
         Button backBtn = new Button("← Back");
         backBtn.setFont(Font.font("Arial", 12));
         backBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: #000;");
-        backBtn.setOnAction(e -> primaryStage.setScene(LoginScene.getLoginScene(primaryStage)));
+        backBtn.setOnAction(e -> {
+            primaryStage.setScene(LoginScene.getLoginScene(primaryStage));
+        });
 
         // 按钮容器（上下间距小一点，避免覆盖卡片）
         VBox buttonBox = new VBox(15, singleBtn, twoBtn);
@@ -55,6 +67,12 @@ public class ModeSelectScene {
         StackPane root = new StackPane(background, rootVBox);
         return new Scene(root, 800, 600);
     }
+
+    private static boolean useEasterBackground = false;
+    public static void setUseEasterBackground(boolean flag) {
+        useEasterBackground = flag;
+    }
+
 
     private static Button createModeButton(String text, String color, Runnable action) {
         Button button = new Button(text);
