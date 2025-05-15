@@ -46,8 +46,6 @@
 | `login_bg.png` | Background for login/register pages |
 | `option_background.png` | Option/restart UI window |
 
-> ⚠️ Place all assets under `resources/assets/` to ensure JavaFX loads them via `getClass().getResource("/assets/filename")`.
-
 ---
 
 ## 🪄 Easter Egg: The Meaning of Life
@@ -65,13 +63,6 @@ When a player lands on a snake's head and does not roll the dice for **10 second
 
 ---
 
-## 📸 Previews
-
-- ![Board](./assets/board.png)
-- ![Easter Egg](./assets/easter.png)
-- ![Logo](./assets/logo.png)
-
----
 
 ## ✨ Future Ideas
 
