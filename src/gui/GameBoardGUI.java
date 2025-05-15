@@ -55,6 +55,7 @@ public class GameBoardGUI {
     private static final String SOUND_OFF_ICON = "\uD83D\uDD07"; // 带斜线的扬声器
     static PauseTransition idleTimer;
     private static ImageView easterImageView;
+    private static boolean hasTriggeredEasterEgg = false;
 
 
     public static Scene getGameScene(Stage primaryStage, boolean twoPlayersMode) {
@@ -330,8 +331,13 @@ public class GameBoardGUI {
         easterImageView.setFitHeight(320);
 
 // 初始化定时器
-        idleTimer = new PauseTransition(Duration.seconds(1));
+        idleTimer = new PauseTransition(Duration.seconds(10));
         idleTimer.setOnFinished(evt -> {
+
+            if (hasTriggeredEasterEgg) return;
+
+            hasTriggeredEasterEgg = true; // 设置标志位
+
             FadeTransition fadeIn = new FadeTransition(Duration.seconds(1), easterImageView);
             fadeIn.setFromValue(0);
             fadeIn.setToValue(1);
