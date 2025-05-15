@@ -136,6 +136,25 @@ public class GameBoardGUI {
         VBox controlBox = new VBox(30);
         controlBox.setAlignment(Pos.TOP_CENTER);
 
+        Label soundIcon = new Label("\uD83D\uDD0A");
+        soundIcon.setFont(Font.font(44));
+        soundIcon.setTextFill(Color.WHITE);
+
+        // —— 点击切换静音/取消静音 ——
+        soundIcon.setOnMouseClicked(e -> {
+            if (soundOn[0]) {
+                bgPlayer.pause();
+                soundOn[0] = false;
+                soundIcon.setText("\uD83D\uDD07");       // 🔇
+                soundIcon.setStyle("-fx-opacity: 0.5;");
+            } else {
+                bgPlayer.play();
+                soundOn[0] = true;
+                soundIcon.setText("\uD83D\uDD0A");       // 🔊
+                soundIcon.setStyle("-fx-opacity: 1;");
+            }
+        });
+
         ImageView diceView = createImageView("/assets/dice1.png", 0, 0, DICE_SIZE, DICE_SIZE);
         final Image[] diceImages = new Image[6];
         for (int i = 0; i < 6; i++) {
@@ -240,6 +259,31 @@ public class GameBoardGUI {
                 }).start();
             }
 
+            // 游戏结束判定（原有 confetti 逻辑）
+            if (engine.isGameOver()) {
+                if (idleTimer != null) {
+                    idleTimer.stop();
+                    idleTimer = null; // 可选：清空引用
+                }
+                if (soundOn[0]) {
+                    bgPlayer.pause();
+                    soundOn[0] = false;
+                    soundIcon.setText("\uD83D\uDD07");       // 🔇
+                    soundIcon.setStyle("-fx-opacity: 0.5;");}
+                ConfettiPane confettiPane = new ConfettiPane(primaryStage);
+                sceneRoot.getChildren().add(confettiPane);
+
+                Label winnerLabel = new Label("Player " + engine.getWinner().name + " Win!");
+                winnerLabel.setFont(Font.font(
+                        baseFont.getFamily(),      // 字体族名
+                        FontWeight.BOLD,           // 加粗
+                        40                         // 字号
+                ));
+                winnerLabel.setTextFill(Color.WHITE);
+                StackPane.setAlignment(winnerLabel, Pos.CENTER);
+                sceneRoot.getChildren().add(winnerLabel);
+            }
+
             // 切换回合并更新提示
             if (twoPlayersMode) {
                 isPlayerOneTurn[0] = !isPlayerOneTurn[0];
@@ -264,24 +308,7 @@ public class GameBoardGUI {
         optionsContentBox.setPadding(new Insets(15));
         optionsContentBox.setPickOnBounds(false);
 
-        Label soundIcon = new Label("\uD83D\uDD0A");
-        soundIcon.setFont(Font.font(44));
-        soundIcon.setTextFill(Color.WHITE);
 
-        // —— 点击切换静音/取消静音 ——
-        soundIcon.setOnMouseClicked(e -> {
-            if (soundOn[0]) {
-                bgPlayer.pause();
-                soundOn[0] = false;
-                soundIcon.setText("\uD83D\uDD07");       // 🔇
-                soundIcon.setStyle("-fx-opacity: 0.5;");
-            } else {
-                bgPlayer.play();
-                soundOn[0] = true;
-                soundIcon.setText("\uD83D\uDD0A");       // 🔊
-                soundIcon.setStyle("-fx-opacity: 1;");
-            }
-        });
 
         optionsContentBox.getChildren().add(soundIcon);
 
@@ -363,31 +390,6 @@ public class GameBoardGUI {
 
 // 启动定时器
         idleTimer.play();
-
-        // 游戏结束判定（原有 confetti 逻辑）
-        if (engine.isGameOver()) {
-            if (idleTimer != null) {
-                idleTimer.stop();
-                idleTimer = null; // 可选：清空引用
-            }
-            if (soundOn[0]) {
-                bgPlayer.pause();
-                soundOn[0] = false;
-                soundIcon.setText("\uD83D\uDD07");       // 🔇
-                soundIcon.setStyle("-fx-opacity: 0.5;");}
-            ConfettiPane confettiPane = new ConfettiPane(primaryStage);
-            sceneRoot.getChildren().add(confettiPane);
-
-            Label winnerLabel = new Label("Player " + engine.getWinner().name + " Win!");
-            winnerLabel.setFont(Font.font(
-                    baseFont.getFamily(),      // 字体族名
-                    FontWeight.BOLD,           // 加粗
-                    40                         // 字号
-            ));
-            winnerLabel.setTextFill(Color.WHITE);
-            StackPane.setAlignment(winnerLabel, Pos.CENTER);
-            sceneRoot.getChildren().add(winnerLabel);
-        }
 
 
         return new Scene(sceneRoot, 1000, 700);
