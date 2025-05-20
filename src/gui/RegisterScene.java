@@ -13,6 +13,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.scene.layout.HBox;
+
 import logic.UserManager;
 
 import java.util.Random;
@@ -21,7 +22,7 @@ public class RegisterScene {
 
     private static Font baseFont = Font.loadFont(
             GameBoardGUI.class.getResourceAsStream("/assets/pixel_font.ttf"),
-            28
+            12
     );
 
     private static String currentCode;  // 保存当前验证码
@@ -48,21 +49,24 @@ public class RegisterScene {
         // 手机号 & 用户名
         TextField phoneField = new TextField();
         phoneField.setPromptText("Phone Number");
+        phoneField.setFont(baseFont);
         phoneField.setMaxWidth(300);
         TextField usernameField = new TextField();
         usernameField.setPromptText("Username");
+        usernameField.setFont(baseFont);
         usernameField.setMaxWidth(300);
-
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Password");
+        passwordField.setFont(baseFont);
         passwordField.setMaxWidth(300);
 
         // 验证码输入 & 发送
         TextField codeField = new TextField();
-        codeField.setPromptText("Verification Code");
-        codeField.setMaxWidth(180);
+        codeField.setPromptText("Verification Code ");
+        codeField.setFont(baseFont);
+        codeField.setMaxWidth(200);
         Button sendCodeBtn = new Button("Send Code");
-        sendCodeBtn.setFont(Font.font(12));
+        sendCodeBtn.setFont(baseFont);
         sendCodeBtn.setStyle(
                 "-fx-background-color: #4a90e2; " +
                         "-fx-text-fill: white; " +
@@ -81,10 +85,8 @@ public class RegisterScene {
         registerBtn.setFont(Font.font(14));
         registerBtn.setFont(Font.loadFont(
                 LoginScene.class.getResource("/assets/pixel_font.ttf").toExternalForm(), 24));
-        registerBtn.setStyle("-fx-background-color: transparent; " +
-                "-fx-text-fill: #fff; " +
-                "-fx-background-radius: 0; " +
-                "-fx-background-color: #4a90e2; " +
+        registerBtn.setStyle(
+                "-fx-background-color: #4a90e2; f" +
                 "-fx-text-fill: white; " +
                 "-fx-background-radius: 20;");
         registerBtn.setOnAction(e -> {

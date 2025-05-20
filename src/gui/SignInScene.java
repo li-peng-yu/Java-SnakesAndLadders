@@ -8,7 +8,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
@@ -18,7 +17,7 @@ public class SignInScene {
 
     private static Font baseFont = Font.loadFont(
             GameBoardGUI.class.getResourceAsStream("/assets/pixel_font.ttf"),
-            28
+            16
     );
 
     public static Scene getSignInScene(Stage primaryStage) {
@@ -41,20 +40,20 @@ public class SignInScene {
         // 用户名 & 密码
         TextField usernameField = new TextField();
         usernameField.setPromptText("Username");
+        usernameField.setFont(baseFont);
         usernameField.setMaxWidth(300);
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Password");
+        passwordField.setFont(baseFont);
         passwordField.setMaxWidth(300);
 
         // 登录按钮
         Button signInBtn = new Button("Sign In");
         signInBtn.setPrefWidth(300);
         signInBtn.setFont(Font.loadFont(LoginScene.class.getResource("/assets/pixel_font.ttf").toExternalForm(), 24));
-        signInBtn.setStyle("-fx-background-color: transparent; "+
-                "-fx-background-color: #4a90e2; " +
-                "-fx-background-radius: 0; " +
-                        "-fx-text-fill: white; " +
-                        "-fx-background-radius: 20;"
+        signInBtn.setStyle("-fx-background-color: #4a90e2; " +
+                "-fx-background-radius: 20; " +
+                        "-fx-text-fill: white;"
         );
         signInBtn.setOnAction(e -> {
             String user = usernameField.getText().trim();

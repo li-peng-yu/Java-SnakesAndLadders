@@ -41,11 +41,11 @@ public class ModeSelectScene {
         title.setTextFill(Color.web("#2f3e46"));
         title.setTranslateY(-140);
         // 按钮统一尺寸与圆角美化
-        Button singleBtn = createModeButton("Single Player", "#2e7d32", () ->{
+        Button singleBtn = createModeButton("Single Player", () ->{
             primaryStage.setScene(GameBoardGUI.getGameScene(primaryStage,false));}
         );
 
-        Button twoBtn = createModeButton("Two Players", "#1565c0", () ->{
+        Button twoBtn = createModeButton("Two Players", () ->{
             primaryStage.setScene(GameBoardGUI.getGameScene(primaryStage,true));});
 
         Button backBtn = new Button("← Back");
@@ -74,10 +74,8 @@ public class ModeSelectScene {
     }
 
 
-    private static Button createModeButton(String text, String color, Runnable action) {
+    private static Button createModeButton(String text, Runnable action) {
         Button button = new Button(text);
-        button.setPrefSize(240, 44);
-        button.setFont(Font.font("Verdana", 15));
         button.setFont(Font.loadFont(
                 LoginScene.class.getResource("/assets/pixel_font.ttf").toExternalForm(), 24));
         button.setStyle("-fx-background-color: transparent; " +

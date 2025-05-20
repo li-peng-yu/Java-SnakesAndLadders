@@ -18,23 +18,14 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.media.Media;        // 新增
 import javafx.scene.media.MediaPlayer;  // 新增
 import javafx.util.Duration;         // 新增 (用于 MediaPlayer.INDEFINITE)
-import java.net.URL;
 import javafx.animation.PauseTransition;
 import javafx.animation.FadeTransition;
 import javafx.animation.SequentialTransition;
-import javafx.util.Duration;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-
 
 import logic.Gameengine;
-// import gui.TokenAnimator; // Assuming TokenAnimator is in the same package or imported correctly
-// import gui.ConfettiPane;  // Assuming ConfettiPane is in the same package or imported correctly
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import gui.PlayerToken;
 
 public class GameBoardGUI {
 
@@ -48,15 +39,11 @@ public class GameBoardGUI {
     private static final double DICE_SIZE = 100;
     private static final int PLAYER_VISUAL_OFFSET_X = 13; // X轴方向的偏移
     private static final int PLAYER_VISUAL_OFFSET_Y = 13; // Y轴方向的偏移
-    private static MediaPlayer backgroundMusicPlayer;
-    private static boolean isMusicPlaying = true; // 跟踪音乐播放状态
     // 新增：定义声音开启和关闭的图标
-    private static final String SOUND_ON_ICON = "\uD83D\uDD0A"; // 带声波的扬声器
-    private static final String SOUND_OFF_ICON = "\uD83D\uDD07"; // 带斜线的扬声器
+
     static PauseTransition idleTimer;
     private static ImageView easterImageView;
     private static boolean hasTriggeredEasterEgg = false;
-
 
     public static Scene getGameScene(Stage primaryStage, boolean twoPlayersMode) {
         BorderPane root = new BorderPane();
@@ -74,10 +61,8 @@ public class GameBoardGUI {
         BorderPane.setAlignment(topTurnView, Pos.CENTER);
         root.setTop(topTurnView);
 
-        String musicUrl = GameBoardGUI.class
-                .getResource("/assets/background.mp3")
-                .toExternalForm();
-        Media bgMedia = new Media(musicUrl);
+        String musical = GameBoardGUI.class.getResource("/assets/background.mp3").toExternalForm();
+        Media bgMedia = new Media(musical);
         MediaPlayer bgPlayer = new MediaPlayer(bgMedia);
         bgPlayer.setCycleCount(MediaPlayer.INDEFINITE);
         bgPlayer.setVolume(0.5);
@@ -87,9 +72,6 @@ public class GameBoardGUI {
 
         Font pixelFont = Font.loadFont(
                 GameBoardGUI.class.getResource("/assets/pixel_font.ttf").toExternalForm(), 24);
-        if (pixelFont == null) {
-            pixelFont = Font.font("Arial", 24);
-        }
 
         HBox centerBox = new HBox(20);
         centerBox.setAlignment(Pos.CENTER);
@@ -113,9 +95,8 @@ public class GameBoardGUI {
                 createImageView("/assets/prop1.png",35,305,50,50)
         );
 
-        // 修改点1: 将 p1Piece 声明为 final
         final PlayerToken p1Token = new PlayerToken("/assets/pieceRed.png", 25, 530);
-        final ImageView p1Piece = p1Token.getAvatarNode(); // 替代原来的 ImageView
+        final ImageView p1Piece = p1Token.getAvatarNode();
         boardPane.getChildren().add(p1Piece);
 
         final PlayerToken p2Token;
@@ -126,10 +107,8 @@ public class GameBoardGUI {
             p2Piece = p2Token.getAvatarNode();
             boardPane.getChildren().add(p2Piece);
         } else {
-            p2Token = null;
             p2Piece = null;
         }
-
 
         centerBox.getChildren().add(boardPane);
 
@@ -397,14 +376,12 @@ public class GameBoardGUI {
 
     private static Image loadImage(String path) {
         try {
-            // Ensure the path starts with "/" if it's relative to the classpath root
             if (!path.startsWith("/")) {
                 path = "/" + path;
             }
             return new Image(GameBoardGUI.class.getResource(path).toExternalForm());
         } catch (Exception e) {
             System.err.println("Failed to load image: " + path);
-            // e.printStackTrace(); // For debugging
             return null;
         }
     }
@@ -422,7 +399,7 @@ public class GameBoardGUI {
         iv.setFitHeight(h);
         iv.setLayoutX(x);
         iv.setLayoutY(y);
-        if ("/assets/ladder1.png".equals(path)) { // Be careful with path comparison if it could have leading slash variations
+        if ("/assets/ladder1.png".equals(path)) {
             iv.setScaleX(-1);
         }
         iv.setSmooth(false); // For pixel art, false is often better
@@ -441,27 +418,20 @@ public class GameBoardGUI {
             col = 9 - col;
         }
 
-        // 假设每个格子的尺寸是 53
-        int cellDimension = 53; // (int) (BOARD_SIZE / 10)
-        // TOKEN_SIZE 应该是已定义的常量, e.g., 40
+        // 每个格子的尺寸是 53
+        int cellDimension = 53;
 
         // 计算单个棋子在格子中居中时的左上角偏移量
-        int baseOffsetX = (cellDimension - (int)TOKEN_SIZE) / 2; // (60 - 40) / 2 = 10
+        int baseOffsetX = (cellDimension - (int)TOKEN_SIZE) / 2;
         int baseOffsetY = (cellDimension - (int)TOKEN_SIZE) / 2;
 
         // 计算棋子在格子中居中时的基础X, Y坐标 (相对于boardPane的0,0)
         int calculatedX = col * cellDimension + baseOffsetX;
         int calculatedY = (9 - row) * cellDimension + baseOffsetY;
 
-        // 应用之前讨论过的全局视觉修正偏移 (如果还需要的话)
-        // 例如: int globalCorrectedX = calculatedX + 15;
-        // 例如: int globalCorrectedY = calculatedY - 20;
-        // 如果您之前的“原地跳”和“位置错误”问题已通过其他方式解决，
-        // 并且棋子能准确落在格子的标准居中位置，那么可能不再需要这个全局修正。
-        // 这里我们先假设之前的全局修正是需要的：
+        // 全局修正
         int globalCorrectedX = calculatedX + 35;
         int globalCorrectedY = calculatedY + 35;
-
 
         // 应用针对不同玩家的视觉微调偏移
         int finalX = globalCorrectedX;
@@ -474,12 +444,9 @@ public class GameBoardGUI {
             finalX += PLAYER_VISUAL_OFFSET_X; // 玩家2 向右移动一点
             finalY -= PLAYER_VISUAL_OFFSET_Y; // 玩家2 向上移动一点 (视觉上偏右上)
         }
-        // 注意: 如果是单人模式，playerName 可能是 "Player 1"，那么它会应用P1的偏移。
-        // 如果不希望单人模式有偏移，可以在这里加一个判断，或者确保单人模式时不传递特定玩家名。
 
         return new int[]{finalX, finalY};
     }
-
 
     private static HBox makeColorRow(ImageView playerPieceToUpdate, Color initialPlayerColor) {
         HBox row = new HBox(5);
@@ -493,13 +460,6 @@ public class GameBoardGUI {
             final String colorFileNameSuffix = colorFileNames[i]; // colorFileNameSuffix is effectively final
 
             Rectangle colorRect = new Rectangle(20, 20, currentColor);
-            // colorRectanglesInRow.add(colorRect); // This line was here. If needed by lambda, this is fine.
-
-            // For the lambda below to use colorRectanglesInRow, it must be final or effectively final.
-            // It is effectively final as its reference doesn't change after this loop.
-            // However, if add was inside loop and used by lambda, better to make colorRectanglesInRow final.
-            // Let's declare it final to be safe, though it's likely already effectively final.
-            // final List<Rectangle> finalColorRectanglesInRow = colorRectanglesInRow; // Or just use colorRectanglesInRow if it's effectively final
 
             if (currentColor.equals(initialPlayerColor)) {
                 colorRect.setStroke(Color.WHITE);
@@ -509,35 +469,12 @@ public class GameBoardGUI {
                 colorRect.setStrokeWidth(1);
             }
 
-            // This lambda captures: playerPieceToUpdate, colorFileNameSuffix, colorRectanglesInRow (or finalColorRectanglesInRow), colorRect
-            // playerPieceToUpdate is a parameter, so it's effectively final for this lambda.
-            // colorRect is local to the loop iteration but re-declared each time, the one captured is the one for that iteration.
-            colorRect.setOnMouseClicked(event -> {
+            colorRect.setOnMouseClicked(e -> {
                 String pieceImagePath = "/assets/piece" + colorFileNameSuffix + ".png";
                 Image newPieceImage = loadImage(pieceImagePath);
                 if (newPieceImage != null) {
                     playerPieceToUpdate.setImage(newPieceImage);
                 }
-                // If colorRectanglesInRow was populated inside this loop and you need all rects:
-                // The current 'colorRectanglesInRow' would be the list from the outer scope.
-                // If 'colorRectanglesInRow' was declared inside 'makeColorRow' and populated in the loop,
-                // then by the time this lambda executes, the list will contain all rectangles from the loop.
-                // The code `colorRectanglesInRow.add(colorRect)` should be BEFORE `colorRect.setOnMouseClicked`
-                // if the intent is for the lambda to iterate over the complete list from *this* call to makeColorRow.
-
-                // The current logic of 'colorRectanglesInRow' being used in lambda might be to update strokes of *all* rects in the current row.
-                // This requires colorRectanglesInRow to be populated before this lambda is defined for all rects.
-                // The way it is structured (add happens before this click listener for *this specific rect*),
-                // it seems `colorRectanglesInRow` should be populated with ALL rects of this row.
-                // So, the `colorRectanglesInRow.add(colorRect);` should ideally be placed such that the list is complete
-                // or the lambda correctly refers to the list that contains all sibling rectangles.
-
-                // Safest: use a new list for each row if `makeColorRow` is called multiple times.
-                // The current code where `colorRectanglesInRow` is instantiated in `makeColorRow` means each call gets a fresh list.
-                // And this list is populated within its `for` loop.
-                // The lambda for each `colorRect` will capture the `colorRectanglesInRow` list specific to its `makeColorRow` invocation.
-                // This is correct. The variable `colorRectanglesInRow` is effectively final within the scope of the lambda.
-                // Its contents are modified (adding rects), but the reference to the list itself is not changed after initialization.
 
                 for (Rectangle rectInRow : colorRectanglesInRow) { // Iterates over the list specific to this row
                     rectInRow.setStroke(Color.WHITE);
