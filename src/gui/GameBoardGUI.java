@@ -103,8 +103,7 @@ public class GameBoardGUI {
                 createImageView("/assets/snake1.png", 420, 400, 152, 124,-200),
                 createImageView("/assets/snake2.png", 170, 320, 120, 125),
                 createImageView("/assets/snake3.png", 270, 40, 170, 200,-10),
-                createImageView("/assets/snake4.png", 50, 100, 80, 130),
-                createImageView("/assets/prop1.png",35,305,50,50)
+                createImageView("/assets/snake4.png", 50, 100, 80, 130)
         );
 
         final PlayerToken p1Token = new PlayerToken("/assets/pieceRed.png", 25, 530);
