@@ -32,14 +32,13 @@ public class UserManager {
                     users = new ConcurrentHashMap<>();
                 }
                 reader.close();
-                System.out.println("用户数据已从 " + USERS_FILE_PATH + " 加载。");
+                System.out.println("User data has been obtained from " + USERS_FILE_PATH + "load.");
             } else {
-                System.out.println("未找到用户数据文件或文件为空，将创建一个新的用户映射。");
                 users = new ConcurrentHashMap<>(); //确保 users 被初始化
             }
         } catch (IOException e) {
-            System.err.println("从文件加载用户数据失败: " + e.getMessage());
-            users = new ConcurrentHashMap<>(); // 出错时也确保 users 被初始化
+            System.err.println("Failed to load user data from the file:" + e.getMessage());
+            users = new ConcurrentHashMap<>(); // 确保 users 被初始化
         }
 
         if (users != null) {
@@ -47,9 +46,7 @@ public class UserManager {
                 String username = entry.getKey();
                 User user = entry.getValue();
                 if (!isValidUser(username, user)) {
-                    System.err.println("警告: 用户数据 '" + username + "' 无效，已跳过。");
-                    // 或者决定整个文件无效
-                    // validData = false; break;
+                    System.err.println("Warning: User data '" + username + "'invalid, Skipped.");
                     continue; // 跳过这个无效用户
                 }
                 users.put(username, user);
@@ -63,28 +60,27 @@ public class UserManager {
             // 检查用户名是否为空，或者 Map 中的 key 和 User 对象内部的 username 是否一致
             return false;
         }
-        if (user.getPassword() == null || user.getPassword().isEmpty()) { // 假设密码（或其哈希）不能为空
+        if (user.getPassword() == null || user.getPassword().isEmpty()) { // 密码不能为空
             return false;
         }
         // 简单示例：电话号码只包含数字
         if (user.getPhoneNumber() == null || !user.getPhoneNumber().matches("\\d+")) return false;
-        // 添加更多校验规则...
         return true;
     }
 
 
     // 检查用户名是否已存在
     public static boolean NewAccount(String username) {
-        return !users.containsKey(username); // 如果用户名不存在，则可以创建新账户
+        return !users.containsKey(username);
     }
 
     // 将用户数据保存到JSON文件
     private static synchronized void saveUsersToFile() {
         try (Writer writer = Files.newBufferedWriter(Paths.get(USERS_FILE_PATH))) {
             gson.toJson(users, writer);
-            System.out.println("用户数据已保存到 " + USERS_FILE_PATH);
+            System.out.println("User data has been saved to " + USERS_FILE_PATH);
         } catch (IOException e) {
-            System.err.println("保存用户数据到文件失败: " + e.getMessage());
+            System.err.println("Failed to save user data to a file: " + e.getMessage());
         }
     }
 
@@ -93,7 +89,7 @@ public class UserManager {
         User newUser = new User(phone, username, password);
         users.put(username, newUser);
         saveUsersToFile(); // 注册新用户后保存数据
-        System.out.println("用户 " + username + " 已注册。");
+        System.out.println("user " + username + " registered");
         currentUsername = username;
     }
 
@@ -135,27 +131,5 @@ public class UserManager {
             return password;
         }
 
-        // （可选）重写 equals 和 hashCode 方法，如果需要在 Map 中正确操作
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            User user = (User) o;
-            return java.util.Objects.equals(username, user.username);
-        }
-
-        @Override
-        public int hashCode() {
-            return java.util.Objects.hash(username);
-        }
-
-        @Override
-        public String toString() {
-            return "User{" +
-                    "phoneNumber='" + phone + '\'' +
-                    ", username='" + username + '\'' +
-                    // 出于安全考虑，通常不在 toString() 中包含密码
-                    '}';
-        }
     }
 }

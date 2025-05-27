@@ -23,9 +23,9 @@ public class GameStateManager {
 
     public static class GameSaveState {
         int player1Position;
-        int player2Position; // Will be -1 if not in 2-player mode or player 2 doesn't exist
-        boolean isPlayerOneTurn; // Whose turn it is next
-        boolean twoPlayersMode;  // The mode for which this state was saved
+        int player2Position;
+        boolean isPlayerOneTurn;
+        boolean twoPlayersMode;
 
 
         public GameSaveState(int p1Pos, int p2Pos, boolean isP1Turn, boolean isTwoPlayersMode) {
@@ -54,8 +54,6 @@ public class GameStateManager {
 
     private static String generateKey(String username, boolean isTwoPlayerMode) {
         if (username == null || username.trim().isEmpty()) {
-            // Fallback for guest or unidentifiable sessions.
-            // Ensure this aligns with how usernames are handled in your application.
             username = "guest";
         }
         return username + "_" + (isTwoPlayerMode ? "multi" : "single");
@@ -76,10 +74,8 @@ public class GameStateManager {
                 System.out.println("Game states loaded from " + GAME_STATE_FILE_PATH);
             } else {
                 activeGameStates = new ConcurrentHashMap<>();
-                System.out.println("No game state file found or file is empty. Initializing new game state map.");
             }
         } catch (IOException e) {
-            System.err.println("Failed to load game states from file: " + e.getMessage());
             activeGameStates = new ConcurrentHashMap<>();
         }
     }
@@ -87,7 +83,6 @@ public class GameStateManager {
     public static synchronized void saveGameStatesToFile() {
         try (Writer writer = Files.newBufferedWriter(Paths.get(GAME_STATE_FILE_PATH))) {
             gson.toJson(activeGameStates, writer);
-            // System.out.println("Game states saved to " + GAME_STATE_FILE_PATH); // Can be verbose
         } catch (IOException e) {
             System.err.println("Failed to save game states to file: " + e.getMessage());
         }
@@ -95,11 +90,6 @@ public class GameStateManager {
 
     public static synchronized void saveCurrentGameState(String username, int p1Position, int p2Position, boolean isPlayerOneTurnNext, boolean isTwoPlayerMode) {
         String key = generateKey(username, isTwoPlayerMode);
-        if ("null".equals(username)) {
-            // 不保存游客的游戏进度
-            System.out.println("Guest mode detected: skipping save.");
-            return;
-        }
         GameSaveState state = new GameSaveState(p1Position, p2Position, isPlayerOneTurnNext, isTwoPlayerMode);
         activeGameStates.put(key, state);
         saveGameStatesToFile();
