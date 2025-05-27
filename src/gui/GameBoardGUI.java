@@ -15,9 +15,9 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.media.Media;        // 新增
-import javafx.scene.media.MediaPlayer;  // 新增
-import javafx.util.Duration;         // 新增 (用于 MediaPlayer.INDEFINITE)
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.util.Duration;
 import javafx.animation.PauseTransition;
 import javafx.animation.FadeTransition;
 import javafx.animation.SequentialTransition;
@@ -25,13 +25,9 @@ import javafx.animation.SequentialTransition;
 import logic.Gameengine;
 import logic.GameStateManager;
 import logic.GameStateManager.GameSaveState;
-import logic.UserManager;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
-import static logic.GameStateManager.saveGameStatesToFile;
 
 public class GameBoardGUI {
 
@@ -45,7 +41,6 @@ public class GameBoardGUI {
     private static final double DICE_SIZE = 100;
     private static final int PLAYER_VISUAL_OFFSET_X = 13; // X轴方向的偏移
     private static final int PLAYER_VISUAL_OFFSET_Y = 13; // Y轴方向的偏移
-    // 新增：定义声音开启和关闭的图标
 
     static PauseTransition idleTimer;
     private static ImageView easterImageView;
@@ -71,7 +66,6 @@ public class GameBoardGUI {
                 List.of("Player 1", "Player 2") : List.of("Player 1"));
 
         GameSaveState savedState = GameStateManager.loadGameStateForUser(currentUsername, twoPlayersMode);
-
 
         String musical = GameBoardGUI.class.getResource("/assets/background.mp3").toExternalForm();
         Media bgMedia = new Media(musical);
@@ -141,8 +135,6 @@ public class GameBoardGUI {
         if (savedState != null) {
             int[] p1Coord = getCoordinates(savedState.getPlayer1Position(), "Player 1");
             System.out.println("P1 计算得到的屏幕坐标: X=" + p1Coord[0] + ", Y=" + p1Coord[1]);
-            p1Piece.setTranslateX(0); // 在设置layoutX/Y之前，重置translate
-            p1Piece.setTranslateY(0); // 在设置layoutX/Y之前，重置translate
             p1Piece.setLayoutX(p1Coord[0]);
             p1Piece.setLayoutY(p1Coord[1]);
 
@@ -150,8 +142,6 @@ public class GameBoardGUI {
                 System.out.println("当前用户: " + currentUsername);
                 System.out.println("P1 原始逻辑位置 (来自JSON): " + savedState.getPlayer1Position());
                 int[] p2Coord = getCoordinates(savedState.getPlayer2Position(), "Player 2");
-                p2Piece.setTranslateX(0); // 重置translate
-                p2Piece.setTranslateY(0); // 重置translate
                 p2Piece.setLayoutX(p2Coord[0]);
                 p2Piece.setLayoutY(p2Coord[1]);
             }
@@ -203,7 +193,7 @@ public class GameBoardGUI {
 
             // 掷骰子并更新模型（包含蛇梯逻辑）
             int steps = engine.rollDice();
-            if (steps == -1 || steps == -2) return;  // 游戏结束或冻结时直接返回
+            if (steps == -1 || steps == -2) return;
 
             if (idleTimer != null) {
                 idleTimer.stop();
@@ -232,34 +222,30 @@ public class GameBoardGUI {
                         if (startPos+steps <= 100) {
                             for (int i = 0; i < steps; i++) {
                             int nextPos = currentPos + 1;
-
-                                int[] from = getCoordinates(currentPos, isP1 ? "Player 1" : "Player 2");
-                                int[] to   = getCoordinates(nextPos,    isP1 ? "Player 1" : "Player 2");
-                                Platform.runLater(() ->
-                                        TokenAnimator.jumpTo(token, from[0], from[1], to[0], to[1])
-                                );
-                                Thread.sleep(300);  // 每格跳跃间隔
-                                currentPos = nextPos;
+                            int[] to   = getCoordinates(nextPos, isP1 ? "Player 1" : "Player 2");
+                            Platform.runLater(() ->
+                                    TokenAnimator.jumpTo(token, to[0], to[1])
+                            );
+                            Thread.sleep(300);  // 每格跳跃间隔
+                            currentPos = nextPos;
                             }
                         }
                         if (startPos+steps > 100) {
                             for (int i = 0; i < steps; i++) {
                                 if(startPos+i+1<=100){
                                     int nextPos = currentPos + 1;
-                                    int[] from = getCoordinates(currentPos, isP1 ? "Player 1" : "Player 2");
                                     int[] to   = getCoordinates(nextPos,    isP1 ? "Player 1" : "Player 2");
                                     Platform.runLater(() ->
-                                            TokenAnimator.jumpTo(token, from[0], from[1], to[0], to[1])
+                                            TokenAnimator.jumpTo(token, to[0], to[1])
                                     );
                                     Thread.sleep(300);  // 每格跳跃间隔
                                     currentPos = nextPos;
                                 }
                                 else{
                                     int nextPos = currentPos - 1;
-                                    int[] from = getCoordinates(currentPos, isP1 ? "Player 1" : "Player 2");
                                     int[] to   = getCoordinates(nextPos,    isP1 ? "Player 1" : "Player 2");
                                     Platform.runLater(() ->
-                                            TokenAnimator.jumpTo(token, from[0], from[1], to[0], to[1])
+                                            TokenAnimator.jumpTo(token, to[0], to[1])
                                     );
                                     Thread.sleep(300);  // 每格跳跃间隔
                                     currentPos = nextPos;
@@ -321,8 +307,7 @@ public class GameBoardGUI {
                 if (soundOn[0]) {
                     bgPlayer.pause();
                     soundOn[0] = false;
-                    soundIcon.setText("\uD83D\uDD07");       // 🔇
-                    soundIcon.setStyle("-fx-opacity: 0.5;");}
+                }
                 ConfettiPane confettiPane = new ConfettiPane(primaryStage);
                 sceneRoot.getChildren().add(confettiPane);
 
@@ -362,10 +347,7 @@ public class GameBoardGUI {
         optionsContentBox.setPadding(new Insets(15));
         optionsContentBox.setPickOnBounds(false);
 
-
-
         optionsContentBox.getChildren().add(soundIcon);
-
 
         Label p1Label = new Label("Player One");
         p1Label.setFont(pixelFont);
@@ -377,7 +359,6 @@ public class GameBoardGUI {
             Label p2Label = new Label("Player Two");
             p2Label.setFont(pixelFont);
             p2Label.setTextFill(Color.WHITE);
-            // p2Piece 在这里不为 null，因为上面的 if (twoPlayersMode) 条件
             optionsContentBox.getChildren().addAll(p2Label, makeColorRow(p2Piece, Color.GREEN));
         }
 
@@ -387,8 +368,7 @@ public class GameBoardGUI {
             if (soundOn[0]) {
                 bgPlayer.pause();
                 soundOn[0] = false;
-                soundIcon.setText("\uD83D\uDD07");       // 🔇
-                soundIcon.setStyle("-fx-opacity: 0.5;");}
+            }
             if (idleTimer != null) {
                 idleTimer.stop();
                 idleTimer = null; // 可选：清空引用
@@ -396,6 +376,7 @@ public class GameBoardGUI {
             GameStateManager.clearGameStateForUser(currentUsername, twoPlayersMode);
             primaryStage.setScene(ModeSelectScene.getModeSelectScene(primaryStage));
         });
+
         StackPane.setAlignment(restartClickArea, Pos.BOTTOM_CENTER);
         StackPane.setMargin(restartClickArea, new Insets(0, 0, 25, 0));
 
@@ -446,7 +427,6 @@ public class GameBoardGUI {
 // 启动定时器
         idleTimer.play();
 
-
         return new Scene(sceneRoot, 1000, 700);
     }
 
@@ -478,7 +458,7 @@ public class GameBoardGUI {
         if ("/assets/ladder1.png".equals(path)) {
             iv.setScaleX(-1);
         }
-        iv.setSmooth(false); // For pixel art, false is often better
+        iv.setSmooth(false);
         iv.setPreserveRatio(true);
         return iv;
     }
@@ -548,16 +528,14 @@ public class GameBoardGUI {
             colorRect.setOnMouseClicked(e -> {
                 String pieceImagePath = "/assets/piece" + colorFileNameSuffix + ".png";
                 Image newPieceImage = loadImage(pieceImagePath);
-                if (newPieceImage != null) {
                     playerPieceToUpdate.setImage(newPieceImage);
-                }
 
-                for (Rectangle rectInRow : colorRectanglesInRow) { // Iterates over the list specific to this row
+                for (Rectangle rectInRow : colorRectanglesInRow) {
                     rectInRow.setStroke(Color.WHITE);
                     rectInRow.setStrokeWidth(rectInRow == colorRect ? 3 : 1); // Highlight the clicked one
                 }
             });
-            colorRectanglesInRow.add(colorRect); // Add after setting listener, or before; here it means list is built up
+            colorRectanglesInRow.add(colorRect);
             row.getChildren().add(colorRect);
         }
         return row;

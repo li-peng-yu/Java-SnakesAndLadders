@@ -22,8 +22,6 @@ public class ModeSelectScene {
             28
     );
     public static Scene getModeSelectScene(Stage primaryStage) {
-        // 背景图
-        // >>> 根据彩蛋标记选择背景
         String bgPath = useEasterBackground
                 ? "/assets/mode_select_easter.png"
                 : "/assets/mode_bg.png";
@@ -33,7 +31,7 @@ public class ModeSelectScene {
         background.setFitHeight(600);
         background.setPreserveRatio(false);
 
-        // 标题文字（稍微上移）
+
         Label title = new Label("CHOOSE YOUR MODE");
         title.setFont(Font.font(
                 baseFont.getFamily(),      // 字体族名

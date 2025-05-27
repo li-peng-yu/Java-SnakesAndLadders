@@ -13,11 +13,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.scene.layout.HBox;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken; // 用于处理泛型列表
 import javafx.scene.control.Alert;
-import javafx.stage.Stage; // 假设 primaryStage 是 Stage 类型
 
 import logic.UserManager;
 
