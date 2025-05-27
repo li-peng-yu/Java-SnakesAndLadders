@@ -6,13 +6,14 @@
 
 ## 📦 Features
 
-- 🎮 Turn-based 1P/2P gameplay with animated per-step token jumps
-- 🧑‍💻 Login & Register system with basic user management
-- 🎲 Dice roll animations with alternating turn display
-- 🐍 Snakes and ladders visually span across tiles with pixel art assets
-- 🌠 Easter egg: a “42” appears if dice is not clicked within 10s on a snake head
-- 🎉 Victory triggers a custom confetti animation pane
-
+- 🎨 **JavaFX GUI** with a pixel-art theme and custom animations.
+- 👥 **User system** with registration, login, and guest mode support.
+- 💾 **Game state auto-save and resume**, with separate save files for each user.
+- 🧠 **Single-player and Two-player mode**.
+- 🐍🪜 **Dynamic snakes and ladders** rendered across multiple tiles.
+- 🎉 **Victory animation** using confetti effects.
+- 🛸 **Easter Egg**: If a player lands on a snake head and is idle for 15 seconds, the number `42` appears, and the background changes to a galaxy theme.
+- 🔄 Restart and mode selection from the main interface.
 ---
 
 ## 🗂️ Project Structure
@@ -59,58 +60,77 @@ If a player lands on a snake's head and doesn't click the dice for 10 seconds:
 
 ---
 
-## 🛠 How to Run
+## 💻 How to Run
 
-### ☕ Requirements
+### 🧠 Option 1: IntelliJ IDEA
 
-- Java **11 or higher** (tested with Java 17)
-- JavaFX SDK **17 or later**
+1. Open project in IntelliJ IDEA.
+
+2. Go to:
+File > Project Structure > Libraries > + > Java
+and add:
+- `javafx-sdk-XX/lib`
+- `gson-2.10.1.jar`
+
+3. Configure VM options:--module-path /path/to/javafx-sdk/lib --add-modules javafx.controls,javafx.fxml
+4. Right-click `Main.java` and select **Run**.
+
+✅ Done! IntelliJ will handle the rest.
 
 ---
 
-### 🚀 IntelliJ IDEA Setup
+### 🧠 Option 2: VS Code
 
-1. Open the project in IntelliJ.
-2. Go to:  
-   `File → Project Structure → Libraries → + → Java`  
-   and select your JavaFX SDK folder (`lib` directory).
-3. In **Run/Debug Configurations** for `Main.java`, add VM options:
+1. Install extensions:
+- **Java Extension Pack**
+- **JavaFX Support for VS Code**
 
-```bash
---module-path /path/to/javafx-sdk-17/lib --add-modules javafx.controls,javafx.fxml
-Replace /path/to/javafx-sdk-17/ with your actual SDK path.
-```
+2. Download JavaFX and Gson as above.
 
-### 💻 VS Code Setup
+3. In `.vscode/launch.json`, set up:
 
-Install the Java Extension Pack from Microsoft.
-
-Create a .vscode/launch.json with the following:
-
+```json
 {
-  "type": "java",
-  "name": "Launch Game",
-  "request": "launch",
-  "mainClass": "gui.Main",
-  "vmArgs": "--module-path /path/to/javafx-sdk-17/lib --add-modules javafx.controls,javafx.fxml"
+"type": "java",
+"name": "Launch Main",
+"request": "launch",
+"mainClass": "Main",
+"vmArgs": "--module-path /path/to/javafx-sdk/lib --add-modules javafx.controls,javafx.fxml",
+"classpath": [
+ "src",
+ "gson-2.10.1.jar"
+]
 }
-Replace the --module-path with your JavaFX SDK path.
+```
+4.Compile and run from Run & Debug panel.
 
-### 📸 Screenshots
+Tip: You may also use tasks to compile JavaFX+Gson manually if not using the extension pack.
 
-(Add image previews if hosted online or in your repo)
 
-### ✨ Possible Future Features
+## 🌌 Easter Egg
+If a player lands on a snake and does not move for 15 seconds, the number 42 (a reference to The Hitchhiker’s Guide to the Galaxy) appears. Afterward, the background changes to a galaxy-themed scene.
 
-Add sound effects and background music with mute toggle
+## 🧠 Save System
+Users stored in users.json
 
-Single player mode vs AI
+Each player's game state saved to gamestates.json
 
-Online multiplayer support
+Automatically loaded on login
 
-Custom board or level editor
+Guest mode does not trigger save
 
-### 👨‍💻 Authors
+Restarting the game clears current save
+
+
+## 👤 Contributors
+Rand – UI design, logic, architecture
+
+Add more contributors if needed
+
+## 📄 License
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 👨‍💻 Authors
 
 **Rand (Pengyu LI)**
 
