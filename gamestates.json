@@ -1,0 +1,8 @@
+{
+  "RAND_single": {
+    "player1Position": 33,
+    "player2Position": -1,
+    "isPlayerOneTurn": true,
+    "twoPlayersMode": false
+  }
+}
